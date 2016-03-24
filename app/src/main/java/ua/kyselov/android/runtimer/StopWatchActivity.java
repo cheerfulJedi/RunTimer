@@ -12,25 +12,33 @@ import android.os.Handler;
 public class StopWatchActivity extends AppCompatActivity {
     private int seconds = 0;
     private boolean running;
+    private boolean wasRunnig;
     TextView timeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null){
+            running = savedInstanceState.getBoolean("runningState");
+            seconds = savedInstanceState.getInt("secondsState");
+            wasRunnig = savedInstanceState.getBoolean("wasRunningState");
+        }
         setContentView(R.layout.activity_stop_watch);
         timeView = (TextView)findViewById(R.id.timerTxtV);
         runTimer();
     }
 
     public void onTimerStart(View view) {
-        running = true;
+         running = true;
     }
 
     public void onTimerStop(View view) {
+        wasRunnig = running;
         running = false;
     }
 
     public void onTimerReset(View view) {
+        wasRunnig = false;
         running = false;
         seconds = 0;
     }
@@ -53,7 +61,28 @@ public class StopWatchActivity extends AppCompatActivity {
                 handler.postDelayed(this, 1000);
             }
         });
+    }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        savedInstanceState.putBoolean("runningState", running);
+        savedInstanceState.putInt("secondsState", seconds);
+        savedInstanceState.putBoolean("wasRunningState", running);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        if(wasRunnig){
+            running = true;
+        }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        wasRunnig = running;
+        running = false;
     }
 }
 
